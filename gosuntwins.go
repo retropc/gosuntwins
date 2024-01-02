@@ -27,17 +27,15 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/porjo/gosuntwins/pvoutput"
 	"github.com/porjo/gosuntwins/serial"
 )
 
-const period int = 10 //seconds between reads
+const period int = 1 //seconds between reads
 
 var debug bool
 var dataFile *os.File
 
 func main() {
-
 	var err error
 
 	var serialPort string
@@ -60,11 +58,11 @@ func main() {
 	}
 	defer dataFile.Close()
 
-	fmt.Printf("Writing results to file '%s'\n", *f)
+	fmt.Fprintf(os.Stderr, "Writing results to file '%s'\n", *f)
 
 	config := &serial.Config{Port: serialPort, Debug: debug}
 
-	fmt.Printf("Opening port %s\n", serialPort)
+	fmt.Fprintf(os.Stderr, "Opening port %s\n", serialPort)
 	s, err := serial.OpenPort(config)
 	if err != nil {
 		log.Fatal("Error initializing inverter, ", err)
@@ -80,11 +78,6 @@ func main() {
 			if err != nil {
 				log.Println("Error reading from inverter, ", err)
 				quitChan <- true
-			}
-
-			err = pvoutput.Upload(reading)
-			if err != nil && err != pvoutput.NotInitialized {
-				log.Println("Error uploading data to PVoutput, ", err)
 			}
 
 			err = outputInverter(reading)
@@ -108,7 +101,7 @@ func main() {
 
 func outputInverter(reading *serial.Reading) error {
 
-	resultsStr := fmt.Sprintf("%s, ", time.Now())
+	resultsStr := fmt.Sprintf("%d, ", time.Now().Unix())
 
 	s := reflect.ValueOf(reading).Elem()
 	for i := 0; i < s.NumField(); i++ {
@@ -121,9 +114,10 @@ func outputInverter(reading *serial.Reading) error {
 		}
 	}
 
-	if debug {
+/*	if debug {
 		fmt.Println(resultsStr)
 	}
+*/
 
 	_, err := dataFile.WriteString(resultsStr + "\n")
 	if err != nil {
