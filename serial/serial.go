@@ -28,7 +28,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/tarm/goserial"
+	"github.com/retropc/goserial"
 )
 
 // This struct holds the binary data read from the inverter.

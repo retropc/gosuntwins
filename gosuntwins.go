@@ -27,7 +27,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/porjo/gosuntwins/serial"
+	"github.com/retropc/gosuntwins/serial"
 )
 
 const period int = 1 //seconds between reads
